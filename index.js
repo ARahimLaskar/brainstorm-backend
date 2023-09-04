@@ -9,11 +9,11 @@ const userRoutes = require("./Routes/userRoutes.js");
 const app = express();
 app.use(express.json());
 // app.use(cors());
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+// app.use(
+//   cors({
+//     origin: "*",
+//   })
+// );
 
 // app.use("/", (req, res) => {
 //   res.send("welcome");
