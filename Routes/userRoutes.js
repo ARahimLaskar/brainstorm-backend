@@ -29,21 +29,20 @@ userRoutes.post("/signup", async (req, res) => {
 
 userRoutes.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const user = await UserModel.findOne({ email });
-  const hash = user.password;
 
-  bcrypt.compare(password, hash, function (err, result) {
-    if (err) {
-      res.send("something went wrong");
-    }
-
-    if (result) {
+  try {
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+    } else if (await bcrypt.compare(password, user.password)) {
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-      res.send({ msg: "login Successful", user, token });
+      res.send({ msg: "login successful", user, token });
     } else {
-      res.send("invalid credentials");
+      res.status(401).json({ error: "Invalid Credentials" });
     }
-  });
+  } catch (error) {
+    res.status(500).json({ error: "an error occurred" });
+  }
 });
 
 module.exports = userRoutes;
