@@ -9,19 +9,10 @@ const userRoutes = require("./Routes/userRoutes.js");
 const app = express();
 app.use(express.json());
 app.use(cors());
-// app.use(
-//   cors({
-//     origin: "*",
-//   })
-// );
-
-// app.use("/", (req, res) => {
-//   res.send("welcome");
-// });
 
 app.use("/user", userRoutes);
 
-const PORT = 8080;
+const PORT = 8000;
 
 app.listen(PORT, async () => {
   try {
