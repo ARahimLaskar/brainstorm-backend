@@ -20,7 +20,7 @@ userRoutes.post("/signup", async (req, res) => {
 
     const newUser = new UserModel({ name, password: hashedPassword, email });
     await newUser.save();
-    res.status(201).json({ message: "User registered successfully" });
+    res.status(200).json({ message: "User registered successfully" });
   } catch (error) {
     console.error("Error during registration:", error);
     res.status(500).json({ error: "An error occurred" });
@@ -28,28 +28,26 @@ userRoutes.post("/signup", async (req, res) => {
 });
 
 userRoutes.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
   try {
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ msg: "enter all fields" });
     }
-    const hash = user.password;
 
-    bcrypt.compare(password, hash, function (err, result) {
-      if (err) {
-        res.send("something went wrong");
-      }
-      if (result) {
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-        res.send({ msg: "login Successful", user, token });
-      } else {
-        res.send("invalid credentials");
-      }
-    });
+    const user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(200).json({ msg: "no user found" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(200).json({ msg: "invalid credentials" });
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+    res.status(200).json({ msg: "login successful", user, token });
   } catch (error) {
-    res.status(500).json({ error: "an error occurred" });
+    res.status(500).json({ err: error.message });
   }
 });
 
